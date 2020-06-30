@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { View, Text, Platform } from "react-native";
+import * as Permissions from "expo-permissions"; // pour obtenir permission
+import * as Location from "expo-location"; // pour obtenir GPS
 import MapView from "react-native-maps";
-import { View, Text } from "react-native";
 import axios from "axios";
-import * as Permissions from "expo-permissions";
-import * as Location from "expo-location";
+import { useNavigation } from "@react-navigation/core";
 
-const Aroundme = () => {
+const AroundMe = () => {
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState([]);
-  const [location, setLocation] = useState({});
+  const navigation = useNavigation();
 
   useEffect(() => {
     const askPermission = async () => {
@@ -39,7 +40,6 @@ const Aroundme = () => {
         );
 
         setData(response.data);
-        console.log(response.data);
       } catch (error) {
         console.log(error.message);
       }
@@ -49,15 +49,45 @@ const Aroundme = () => {
     }
   }, [latitude, longitude]);
 
-  return isLoading ? (
-    <Text>En cours de chargement...</Text>
-  ) : (
-    <View>
-      <MapView style={{ width: "100%", height: "100%" }}></MapView>
-
-      <Text>Aroundme</Text>
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      {isLoading === false ? (
+        <MapView
+          showsUserLocation={true}
+          style={{
+            width: "100%",
+            flex: 1,
+          }}
+          initialRegion={{
+            latitude: latitude,
+            longitude: longitude,
+            latitudeDelta: 0.15,
+            longitudeDelta: 0.15,
+          }}
+        >
+          {data.map((marker, index) => {
+            return (
+              <MapView.Marker
+                key={marker._id}
+                coordinate={{
+                  latitude: marker.loc[1],
+                  longitude: marker.loc[0],
+                }}
+              >
+                <MapView.Callout
+                  onPress={() =>
+                    navigation.navigate("Room", { id: marker._id })
+                  }
+                >
+                  <Text>{marker.title}</Text>
+                </MapView.Callout>
+              </MapView.Marker>
+            );
+          })}
+        </MapView>
+      ) : null}
     </View>
   );
 };
 
-export default Aroundme;
+export default AroundMe;
