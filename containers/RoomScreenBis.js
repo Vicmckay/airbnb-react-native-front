@@ -15,9 +15,6 @@ import { ScrollView } from "react-native-gesture-handler";
 import Carousel from "react-native-snap-carousel";
 
 const RoomScreen = () => {
-  _renderItem = ({ item }) => {
-    return <Image style={styles.offerImage} source={{ uri: item }} />;
-  };
   const { params } = useRoute();
   const route = useRoute();
   const [isLoading, setIsLoading] = useState(true);
@@ -50,15 +47,11 @@ const RoomScreen = () => {
     <ScrollView>
       <View style={styles.offer}>
         <View>
-          <Carousel
-            ref={(c) => {
-              _carousel = c;
+          <ImageBackground
+            style={styles.offerImage}
+            source={{
+              uri: data.photos[0],
             }}
-            data={data.photos}
-            renderItem={_renderItem}
-            sliderWidth={380}
-            itemWidth={380}
-            loop={true}
           >
             <View
               style={{
@@ -73,7 +66,7 @@ const RoomScreen = () => {
                 {data.price} €
               </Text>
             </View>
-          </Carousel>
+          </ImageBackground>
           <View style={styles.container}>
             <View>
               <View style={{ flexDirection: "row" }}>

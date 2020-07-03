@@ -13,7 +13,7 @@ import axios from "axios";
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-function SignInScreen({ setToken, navigation }) {
+function SignInScreen({ setToken, setId, navigation }) {
   const [email, setEmail] = useState("nono@airbnb-api.com");
   const [password, setPassword] = useState("pass");
   return (
@@ -81,6 +81,8 @@ function SignInScreen({ setToken, navigation }) {
             // console.log(response.data.token);
 
             setToken(response.data.token);
+            // Enregistrer l'id pour l'utiliser dans la page Profile.
+            setId(response.data.id);
           }}
         >
           <Text style={{ color: "#F35960", fontSize: 20 }}>Se connecter</Text>

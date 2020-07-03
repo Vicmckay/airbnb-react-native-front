@@ -9,13 +9,13 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 // icons
 import { Ionicons, Entypo } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 // import des containers
 import HomeScreen from "./containers/HomeScreen";
 import ProfileScreen from "./containers/ProfileScreen";
 import SignInScreen from "./containers/SignInScreen";
 import SignUpScreen from "./containers/SignUpScreen";
-import SettingsScreen from "./containers/SettingsScreen";
 import Aroundme from "./containers/Aroundme";
 import RoomScreen from "./containers/RoomScreen";
 
@@ -24,17 +24,27 @@ const Stack = createStackNavigator();
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState({});
+  const [userToken, setUserToken] = useState(null);
+  const [userId, setUserId] = useState(null);
 
-  const setToken = async (token, id) => {
-    if (token && id) {
+  const setToken = async (token) => {
+    if (token) {
       AsyncStorage.setItem("userToken", token);
-      AsyncStorage.setItem("userId", id);
     } else {
       AsyncStorage.removeItem("userToken");
     }
 
-    setUser({ token: token, id: id });
+    setUserToken({ token: token });
+  };
+
+  const setId = async (id) => {
+    if (id) {
+      AsyncStorage.setItem("userId", id);
+    } else {
+      AsyncStorage.removeItem("userId");
+    }
+
+    setUserId({ id: id });
   };
 
   useEffect(() => {
@@ -42,10 +52,11 @@ export default function App() {
     const bootstrapAsync = async () => {
       // We should also handle error for production apps
       const userToken = await AsyncStorage.getItem("userToken");
-
+      const userId = await AsyncStorage.getItem("userId");
       // This will switch to the App screen or Auth screen and this loading
       // screen will be unmounted and thrown away.
-      setUser(userToken);
+      setUserToken(userToken);
+      setUserId(userId);
       setIsLoading(false);
     };
 
@@ -54,14 +65,16 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      {isLoading ? null : user && user.token === null ? (
+      {isLoading ? null : userToken && userToken.token === null ? (
         // Pas de token, l'utilisateur n'est pas connecté
         <Stack.Navigator>
           <Stack.Screen
             name="SignIn"
             options={{ header: () => null, animationEnabled: false }}
           >
-            {(props) => <SignInScreen {...props} setToken={setToken} />}
+            {(props) => (
+              <SignInScreen {...props} setToken={setToken} setId={setId} />
+            )}
           </Stack.Screen>
           <Stack.Screen
             options={{ header: () => null, animationEnabled: false }}
@@ -80,8 +93,8 @@ export default function App() {
             {() => (
               <Tab.Navigator
                 tabBarOptions={{
-                  activeTintColor: "tomato",
-                  inactiveTintColor: "gray",
+                  activeTintColor: "black",
+                  inactiveTintColor: "white",
                   style: {
                     backgroundColor: "#F1485C",
                   },
@@ -136,14 +149,15 @@ export default function App() {
                   )}
                 </Tab.Screen>
                 <Tab.Screen
-                  name="Settings"
+                  style={{ color: "white" }}
+                  name="Profile"
                   options={{
-                    tabBarLabel: "Settings",
+                    tabBarLabel: "Profile",
                     tabBarIcon: ({ color, size }) => (
-                      <Ionicons
-                        name={"ios-options"}
-                        size={size}
-                        color={"white"}
+                      <MaterialCommunityIcons
+                        name="face-profile"
+                        size={24}
+                        color="white"
                       />
                     ),
                   }}
@@ -151,14 +165,21 @@ export default function App() {
                   {() => (
                     <Stack.Navigator>
                       <Stack.Screen
-                        name="Settings"
-                        options={{ title: "Settings", tabBarLabel: "Settings" }}
+                        name="Profile"
+                        options={{ title: "Profile", tabBarLabel: "Profile" }}
                       >
-                        {() => <SettingsScreen setToken={setToken} />}
+                        {() => (
+                          <ProfileScreen
+                            userToken={userToken}
+                            setToken={setToken}
+                            userId={userId}
+                          />
+                        )}
                       </Stack.Screen>
                     </Stack.Navigator>
                   )}
                 </Tab.Screen>
+
                 <Tab.Screen
                   name="Aroundme"
                   options={{
