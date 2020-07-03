@@ -6,9 +6,6 @@
 
 Copie de l'application Airbnb sur React Native avec un écran de login, une inscription, un Home avec la liste des annonces, un Room avec les annonces spécifiques, un Around me pour la géolocalisation et un Profile pour se déconnecter.
 
-**Airbnb Clone **  
-6 screens are availables : Login, Signup, Home, Room, Around Me and Profile.
-
 ## Screenshots
 
 <img
